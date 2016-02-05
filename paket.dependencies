@@ -1,0 +1,6 @@
+source https://nuget.org/api/v2
+
+nuget Fuchu
+nuget Suave
+nuget Suave.Testing
+nuget Unquote

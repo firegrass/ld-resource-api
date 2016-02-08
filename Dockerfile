@@ -6,9 +6,7 @@ ADD . /ld-resource-api
 
 WORKDIR /ld-resource-api
 
-RUN mono .paket/paket.bootstrapper.exe && \
-    mono .paket/paket.exe update && \
-    fsharpi tests/Tests.fsx && \
+RUN ./build.sh && \
     ls -a . | grep -v "src" | grep -v "packages" | xargs -i rm -rf {}
 
 CMD cd /ld-resource-api && fsharpi src/RunServer.fsx

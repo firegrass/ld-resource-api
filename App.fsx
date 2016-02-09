@@ -8,11 +8,16 @@ open Suave.Successful
 open Suave.RequestErrors
 open System.IO
 
-let createFile path (req:HttpRequest) =
-  CREATED "arse"
+let writeFile path (req:HttpRequest) =
+  let dir = "/data/statements/" + path
+  let file = dir + "/Statement.html"
+
+  dir |> Directory.CreateDirectory |> ignore
+  File.WriteAllBytes (file, req.rawForm)
+  CREATED (sprintf "Created %s" path)
+   
 
 let app =
-    choose
-        [ POST >=> choose
-            [ pathScan "/statement/%s" (fun path -> request(fun req -> createFile path req))]
-          NOT_FOUND "Found no handlers" ]
+  choose
+    [ POST >=> pathScan "/statement/%s" (fun path -> request(fun req -> writeFile path req))
+      NOT_FOUND "Found no handlers" ]

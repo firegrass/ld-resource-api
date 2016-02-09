@@ -1,5 +1,6 @@
 #load "App.fsx"
 #load "TestUtils.fsx"
+#load "TestRunner.fsx"
 
 #r "System.Core.dll"
 #r "System.dll"
@@ -9,16 +10,18 @@
 #r "packages/Microsoft.Net.Http/lib/net40/System.Net.Http.dll"
 
 open Fuchu
+open Fuchu.Test
+open Fuchu.Impl
 open Swensen.Unquote
 open Suave
 open Suave.Testing
-open App
+open TestRunner
 open TestUtils
 open System
 open System.Net
 open System.IO
 open System.Net.Http
-
+open App
 
 try
   Directory.CreateDirectory "/data/statements" |> ignore
@@ -26,8 +29,8 @@ with _ -> ()
 
 let tests =
   testList "resource api tests:" [
-    testList "When POSTing a statement" [
-      testCase "it should return CREATED 201" <| fun _ ->
+    testList "POST a statement" [
+      testCase "should return CREATED 201" <| fun _ ->
 
         use data = new StringContent("")
 
@@ -45,10 +48,10 @@ let tests =
         |> post "/statement/qs1/st1" (Some data)
         |> ignore
 
-        test <@ File.ReadAllText "/statements/qs1/st1/Statement.html" = "content" @>
+        test <@ File.ReadAllText "/data/statements/qs1/st1/Statement.html" = "content" @>
 
     ]
   ]
 
-run tests
+runWithPrinter tests
 

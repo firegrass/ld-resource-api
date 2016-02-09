@@ -1,5 +1,5 @@
 #!/bin/sh
 mono .paket/paket.bootstrapper.exe
-mono .paket/paket.exe restore
+mono .paket/paket.exe update
 
-fsharpi tests/Tests.fsx
+fsharpi --consolecolors+ Tests.fsx

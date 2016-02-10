@@ -31,24 +31,17 @@ let tests =
   testList "resource api tests:" [
     testList "POST a statement" [
       testCase "should return CREATED 201" <| fun _ ->
-
-        use data = new StringContent("")
-
-        let res = 
-          runServer ()
-          |> post "/statement/qs1/st1" (Some data)
-
+        let res = post "/statement/qs1/st1" ""
         test <@ res.StatusCode = HttpStatusCode.Created @>
 
-      testCase "it should create it" <| fun _ ->
-
-        use data = new StringContent("content")
-
-        runServer ()
-        |> post "/statement/qs1/st1" (Some data)
-        |> ignore
-
+      testCase "it should create the statement on disk" <| fun _ ->
+        post "/statement/qs1/st1" "content" |> ignore
         test <@ File.ReadAllText "/data/statements/qs1/st1/Statement.html" = "content" @>
+
+      testCase "it should update the statement on disk" <| fun _ ->
+        post "/statement/qs1/st1" "initial content" |> ignore
+        post "/statement/qs1/st1" "updated content" |> ignore
+        test <@ File.ReadAllText "/data/statements/qs1/st1/Statement.html" = "updated content" @>
 
     ]
   ]

@@ -25,8 +25,9 @@ let respParse (response : HttpResponseMessage) =
 let coreReq methd path data =
   reqResp methd path "" data None System.Net.DecompressionMethods.None id respParse
 
-let post path data =
-  coreReq HttpMethod.POST path data
+let post path content =
+  use data = new StringContent(content)
+  runServer() |> coreReq HttpMethod.POST path (Some data)
 
 let get path =
-  coreReq HttpMethod.GET path None
+  runServer() |> coreReq HttpMethod.GET path None

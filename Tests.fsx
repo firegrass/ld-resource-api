@@ -24,25 +24,29 @@ open System.Net.Http
 open App
 
 try
-  Directory.CreateDirectory "/data/statements" |> ignore
+  Directory.CreateDirectory "/data/publishedstatements" |> ignore
 with _ -> ()
 
 let tests =
-  testList "resource api tests:" [
+  testList "published statement api tests:" [
     testList "POST a statement" [
       testCase "should return CREATED 201" <| fun _ ->
         let res = post "/statement/qs1/st1" ""
         test <@ res.StatusCode = HttpStatusCode.Created @>
 
       testCase "it should create the statement on disk" <| fun _ ->
-        post "/statement/qs1/st1" "content" |> ignore
-        test <@ File.ReadAllText "/data/statements/qs1/st1/Statement.html" = "content" @>
+        post "/publishedstatement/qs1/st1" "content" |> ignore
+        test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "content" @>
 
       testCase "it should update the statement on disk" <| fun _ ->
-        post "/statement/qs1/st1" "initial content" |> ignore
-        post "/statement/qs1/st1" "updated content" |> ignore
-        test <@ File.ReadAllText "/data/statements/qs1/st1/Statement.html" = "updated content" @>
+        post "/publishedstatement/qs1/st1" "initial content" |> ignore
+        post "/publishedstatement/qs1/st1" "updated content" |> ignore
+        test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "updated content" @>
 
+    ]
+    testList "GET a statement" [
+      POST "/publishedstatement/qs1/st1" "content" |> ignore
+      testCase "should return 200 if statement exists" <| fun _ ->
     ]
   ]
 

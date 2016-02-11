@@ -23,30 +23,36 @@ open System.IO
 open System.Net.Http
 open App
 
-try
+let setup () =
   Directory.CreateDirectory "/data/publishedstatements" |> ignore
-with _ -> ()
+
+let teardown () =
+  Directory.Delete("/data/publishedstatements", true)
+
+let runTestWith setup teardown test () =
+  setup ()
+  let r = test ()
+  teardown ()
+  r
 
 let tests =
-  testList "published statement api tests:" [
+  testList "published statement api" [
     testList "POST a statement" [
-      testCase "should return CREATED 201" <| fun _ ->
-        let res = post "/statement/qs1/st1" ""
-        test <@ res.StatusCode = HttpStatusCode.Created @>
 
-      testCase "it should create the statement on disk" <| fun _ ->
-        post "/publishedstatement/qs1/st1" "content" |> ignore
-        test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "content" @>
+      yield! testFixture (runTestWith setup teardown) [
+        "should return CREATED 201", fun _ ->
+          let res = post "/publishedstatement/qs1/st1" ""
+          test <@ res.StatusCode = HttpStatusCode.Created @>
 
-      testCase "it should update the statement on disk" <| fun _ ->
-        post "/publishedstatement/qs1/st1" "initial content" |> ignore
-        post "/publishedstatement/qs1/st1" "updated content" |> ignore
-        test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "updated content" @>
+        "should create the statement on disk", fun _ ->
+          post "/publishedstatement/qs1/st1" "content" |> ignore
+          test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "content" @>
 
-    ]
-    testList "GET a statement" [
-      POST "/publishedstatement/qs1/st1" "content" |> ignore
-      testCase "should return 200 if statement exists" <| fun _ ->
+        "should update the statement on disk", fun _ ->
+          post "/publishedstatement/qs1/st1" "initial content" |> ignore
+          post "/publishedstatement/qs1/st1" "updated content" |> ignore
+          test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "updated content" @>
+      ]
     ]
   ]
 

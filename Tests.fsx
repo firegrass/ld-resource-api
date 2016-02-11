@@ -35,6 +35,15 @@ let runTestWith setup teardown test () =
   teardown ()
   r
 
+let writeStatement path content =
+  let dir = "/data/publishedstatements/" + path
+  let file = dir + "/Statement.html"
+  dir |> Directory.CreateDirectory |> ignore
+  File.WriteAllText(path, content)
+
+let readStatement path =
+  File.ReadAllText "/data/publishedstatements/" + path
+
 let tests =
   testList "published statement api" [
     testList "POST a statement" [
@@ -46,14 +55,22 @@ let tests =
 
         "should create the statement on disk", fun _ ->
           post "/publishedstatement/qs1/st1" "content" |> ignore
-          test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "content" @>
+          test <@ readStatement "qs1/st1" = "content" @>
 
         "should update the statement on disk", fun _ ->
           post "/publishedstatement/qs1/st1" "initial content" |> ignore
           post "/publishedstatement/qs1/st1" "updated content" |> ignore
-          test <@ File.ReadAllText "/data/publishedstatements/qs1/st1/Statement.html" = "updated content" @>
+          test <@ readStatement "qs1/st1" = "updated content" @>
       ]
     ]
+   // testList "GET a statement" [
+   //   yield! testFixture (runTestWith setup teardown) [
+   //     "should return 200 if it exists", fun _ ->
+   //       writeStatement "qs1/st1" ""
+   //       let res = get "/publishedstatement/qs1/st1"
+   //       test <@ res.StatusCode = HttpStatusCode.OK @>
+   //   ]
+   // ]
   ]
 
 runWithPrinter tests

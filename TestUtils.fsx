@@ -1,10 +1,13 @@
 module TestUtils
 #load "App.fsx"
+#load "Config.fsx"
+
 #r "packages/Suave/lib/net40/Suave.dll"
 #r "packages/Suave.Testing/lib/net40/Suave.Testing.dll"
 #r "packages/Microsoft.Net.Http/lib/net40/System.Net.Http.dll"
 
 open App
+open Config
 open Suave
 open Suave.Testing
 open System.Net
@@ -16,7 +19,7 @@ type Response = {
 }
 
 let runServer () =
-    runWith defaultConfig app
+  runWith config app
 
 let respParse (response : HttpResponseMessage) =
   {StatusCode = response.StatusCode

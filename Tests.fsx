@@ -1,4 +1,5 @@
 #load "App.fsx"
+#load "Config.fsx"
 #load "TestUtils.fsx"
 #load "TestRunner.fsx"
 
@@ -22,12 +23,15 @@ open System.Net
 open System.IO
 open System.Net.Http
 open App
+open Config
+
+let statementDir = sprintf "%s/publishedstatements" rootDir
 
 let setup () =
-  Directory.CreateDirectory "/data/publishedstatements" |> ignore
+  Directory.CreateDirectory statementDir |> ignore
 
 let teardown () =
-  Directory.Delete("/data/publishedstatements", true)
+  Directory.Delete(statementDir, true)
 
 let runTestWith setup teardown test () =
   setup ()
@@ -36,13 +40,13 @@ let runTestWith setup teardown test () =
   r
 
 let writeStatement path content =
-  let dir = "/data/publishedstatements/" + path
+  let dir = (sprintf "%s/%s" statementDir path)
   let file = dir + "/Statement.html"
   dir |> Directory.CreateDirectory |> ignore
-  File.WriteAllText(path, content)
+  File.WriteAllText(file, content)
 
 let readStatement path =
-  File.ReadAllText "/data/publishedstatements/" + path
+  File.ReadAllText (sprintf "%s/%s/Statement.html" statementDir path)
 
 let tests =
   testList "published statement api" [
@@ -50,27 +54,30 @@ let tests =
 
       yield! testFixture (runTestWith setup teardown) [
         "should return CREATED 201", fun _ ->
-          let res = post "/publishedstatement/qs1/st1" ""
+          let res = post "/publishedstatements/qs1/st1" ""
           test <@ res.StatusCode = HttpStatusCode.Created @>
 
         "should create the statement on disk", fun _ ->
-          post "/publishedstatement/qs1/st1" "content" |> ignore
+          post "/publishedstatements/qs1/st1" "content" |> ignore
           test <@ readStatement "qs1/st1" = "content" @>
 
         "should update the statement on disk", fun _ ->
-          post "/publishedstatement/qs1/st1" "initial content" |> ignore
-          post "/publishedstatement/qs1/st1" "updated content" |> ignore
+          post "/publishedstatements/qs1/st1" "initial content" |> ignore
+          post "/publishedstatements/qs1/st1" "updated content" |> ignore
           test <@ readStatement "qs1/st1" = "updated content" @>
       ]
     ]
-   // testList "GET a statement" [
-   //   yield! testFixture (runTestWith setup teardown) [
-   //     "should return 200 if it exists", fun _ ->
-   //       writeStatement "qs1/st1" ""
-   //       let res = get "/publishedstatement/qs1/st1"
-   //       test <@ res.StatusCode = HttpStatusCode.OK @>
-   //   ]
-   // ]
+    testList "GET a statement" [
+      yield! testFixture (runTestWith setup teardown) [
+        "should return statement when it exists", fun _ ->
+          writeStatement "qs1/st1" "content"
+          let res = get "/publishedstatements/qs1/st1/Statement.html"
+          test <@ res = {StatusCode = HttpStatusCode.OK; Content = "content"} @>
+        "should return not found if it doesnt exists", fun _ ->
+          let res = get "/publishedstatements/doesnot/exist/Statement.html"
+          test <@ res = {StatusCode = HttpStatusCode.NotFound; Content = "Found no handlers"} @>
+      ]
+    ]
   ]
 
 runWithPrinter tests

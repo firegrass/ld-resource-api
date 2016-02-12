@@ -3,5 +3,7 @@ module Config
 
 open Suave
 
+let rootDir = "/data"
 let config = { defaultConfig with
-                             homeFolder = Some ("/data/publishedstatements")}
+                             homeFolder = Some (rootDir)}
+

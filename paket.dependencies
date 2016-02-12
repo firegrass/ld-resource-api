@@ -1,7 +1,7 @@
 source https://nuget.org/api/v2
 
-nuget Fuchu 1.0.3.0
-nuget Suave 1.1.1
-nuget Suave.Testing 1.1.1
+nuget Fuchu 
+nuget Suave
+nuget Suave.Testing 
 nuget System.Net.Http 2.0.20710
-nuget Unquote 3.1.1
+nuget Unquote

@@ -78,6 +78,16 @@ let tests =
           test <@ res = {StatusCode = HttpStatusCode.NotFound; Content = "Found no handlers"} @>
       ]
     ]
+  //  testList "DELETE all resources" [
+  //    yield! testFixture (runTestWith setup teardown) [
+  //      "should delete all statements", fun _ ->
+  //        writeStatement "qs1/st1" "content"
+  //        let res = delete "/resource"
+  //        test <@ res = {StatusCode = HttpStatusCode.OK; Content = "Deleted"} @>
+  //        let getRes = get "/resource/qs1/st1/Statement.html"
+  //        test <@ getRes = {StatusCode = HttpStatusCode.NotFound; Content = "Found no handlers"} @>
+  //    ]
+  //  ]
   ]
 
 runWithPrinter tests

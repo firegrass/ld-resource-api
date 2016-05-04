@@ -34,3 +34,6 @@ let post path content =
 
 let get path =
   runServer() |> coreReq HttpMethod.GET path None
+
+let delete path = 
+  runServer() |> coreReq HttpMethod.DELETE path None

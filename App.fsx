@@ -18,8 +18,14 @@ let writeFile path (req:HttpRequest) =
   File.WriteAllBytes (file, req.rawForm)
   CREATED (sprintf "Created %s" path)
 
+let deleteAllResources ()  =
+  let dir = (sprintf "%s/resource" rootDir)
+  try Directory.Delete(dir, true) with ex -> ()
+  Successful.OK "Deleted"
+
 let app =
   choose
     [ POST >=> pathScan "/resource/%s" (fun path -> request(fun req -> writeFile path req))
+      DELETE >=> path "/resource" >=> deleteAllResources ()
       Files.browse rootDir
       NOT_FOUND "Found no handlers" ]

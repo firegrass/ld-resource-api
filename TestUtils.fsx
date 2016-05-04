@@ -19,7 +19,7 @@ type Response = {
 }
 
 let runServer () =
-  let defaultConfig = {config with bindings = [ HttpBinding.mkSimple HTTP "127.0.0.1" 8083 ]}
+  let defaultConfig = {config with bindings = [ HttpBinding.mkSimple HTTP "127.0.0.1" 8082 ]}
   runWith defaultConfig app
 
 let respParse (response : HttpResponseMessage) =

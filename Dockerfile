@@ -9,6 +9,9 @@ WORKDIR /ld-resource-api
 RUN ./build.sh && \
     ls -a . | grep -v "src" | grep -v "packages" | xargs -i rm -rf {}
 
+# Define mountable directories.
+VOLUME ["/data"]
+
 CMD cd /ld-resource-api && fsharpi src/RunServer.fsx
 
 EXPOSE 8083

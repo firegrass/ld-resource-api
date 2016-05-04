@@ -11,7 +11,7 @@ open System.IO
 open Config
 
 let writeFile path (req:HttpRequest) =
-  let dir = (sprintf "%s/publishedstatements/%s" rootDir path)
+  let dir = (sprintf "%s/resource/%s" rootDir path)
   let file = dir + "/Statement.html"
 
   dir |> Directory.CreateDirectory |> ignore
@@ -20,6 +20,6 @@ let writeFile path (req:HttpRequest) =
 
 let app =
   choose
-    [ POST >=> pathScan "/publishedstatements/%s" (fun path -> request(fun req -> writeFile path req))
+    [ POST >=> pathScan "/resource/%s" (fun path -> request(fun req -> writeFile path req))
       Files.browse rootDir
       NOT_FOUND "Found no handlers" ]

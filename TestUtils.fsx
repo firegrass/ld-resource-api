@@ -19,7 +19,8 @@ type Response = {
 }
 
 let runServer () =
-  runWith config app
+  let defaultConfig = {config with bindings = [ HttpBinding.mkSimple HTTP "127.0.0.1" 8083 ]}
+  runWith defaultConfig app
 
 let respParse (response : HttpResponseMessage) =
   {StatusCode = response.StatusCode
